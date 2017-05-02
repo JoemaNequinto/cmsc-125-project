@@ -1,0 +1,11 @@
+8 Puzzle Variant Game for ICS-OS
+--------------------------------
+
+1. Setup.
+	$chmod 755 run.sh
+	$./run.sh
+
+2. Run 8puzzle.exe inside ics-os
+
+Nequinto, Joe Ma. Aubrey A.  2014-71937
+CMSC 125 T-1L
