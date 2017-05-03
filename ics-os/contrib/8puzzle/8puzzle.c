@@ -3,7 +3,7 @@
 
 void setup_difficulty(); //self explanatory
 void print_board(int x, int y); //set up initial board
-void edit_board();
+void update_board();
 void erase(); //covers an area with a black rectangle
 
 /* constants */
@@ -21,6 +21,11 @@ void erase(); //covers an area with a black rectangle
 #define hard 'h'
 #define back 'b'
 
+#define up_key 'w'
+#define down_key 's'
+#define left_key 'a'
+#define right_key 'd'
+
 #define quit 'x'
 #define reset 'r'
 #define yes 'y'
@@ -32,6 +37,8 @@ void erase(); //covers an area with a black rectangle
 
 /* global variables */
 int difficulty, moves = 0;
+int board[3][3] = { {1, 2, 3}, {4, 5, 6}, {7, 8, 0}};
+int row0, col0;
 
 int main(){
 
@@ -59,11 +66,88 @@ int main(){
 				
 				if(keypress == easy){
 					
-					difficulty = 1; //initialize difficulty
-					setup_difficulty();
-					//update level display
-					erase(25, 125, 40, 30);
-					write_text("0", 190, 150, WHITE, 0);
+					do{
+						if (keypress == easy){
+							difficulty = 1; //initialize difficulty
+							moves = 0;
+							erase(1, 1, 400, 220);
+							setup_difficulty();
+							erase(190, 150, 20, 20);
+							write_text("0", 190, 150, WHITE, 0);
+						}
+
+
+
+						do {
+							if (keypress = (char)getch()){
+								if (keypress == right_key){
+									if (col0 != 2){
+										moves++;
+										erase(190, 150, 20, 20);
+										sprintf(str, "%d", moves);
+										write_text(str, 190, 150, WHITE, 0);
+
+										swapTile(row0, col0, row0, col0 + 1);
+										update_board(120, 55);
+									}
+								} else if (keypress == left_key){
+									if (col0 != 0){
+										moves++;
+										erase(190, 150, 20, 20);
+										sprintf(str, "%d", moves);
+										write_text(str, 190, 150, WHITE, 0);
+										
+										swapTile(row0, col0, row0, col0 - 1);
+										update_board(120, 55);
+									}
+								} else if (keypress == up_key){
+									if (row0 != 0){
+										moves++;
+										erase(190, 150, 20, 20);
+										sprintf(str, "%d", moves);
+										write_text(str, 190, 150, WHITE, 0);
+										
+										swapTile(row0, col0, row0 - 1, col0);
+										update_board(120, 55);
+									}
+								} else if (keypress == down_key){
+									if (row0 != 2){
+										moves++;
+										erase(190, 150, 20, 20);
+										sprintf(str, "%d", moves);
+										write_text(str, 190, 150, WHITE, 0);
+										
+										swapTile(row0, col0, row0 + 1, col0);
+										update_board(120, 55);
+									}
+								}
+
+								if (goalTest() == 1){
+									keypress = (char) getch();
+									keypress = easy;
+									break;
+								}
+							}
+						} while (keypress != quit && keypress != reset);	
+						//continue while player is not quitting, restarting or champion
+					
+						if (keypress == quit){
+							//prompt confirmation then erase message
+							erase(120, 180, 40, 40);
+							write_text("Do you want to exit? y/n ", 50, 180, WHITE, 0); 
+							keypress = (char) getch();
+							erase(50, 180, 220, 40);	
+						} else if (keypress == reset){
+							//prompt confirmation then erase message
+							erase(120, 180, 40, 40);
+							write_text("Do you want to restart? y/n ", 35, 180, WHITE, 0);
+							keypress = (char) getch();
+							if (keypress == yes) keypress = easy;
+							erase(35, 180, 240, 40);	
+						}
+
+					} while (keypress != yes);
+
 				}
 
 				else if(keypress == medium){
@@ -84,40 +168,8 @@ int main(){
 					write_text("0", 190, 150, WHITE, 0);
 				}
 
-				else if(keypress == back){
-					break;
-				}
-
 				else 
 					continue;
-
-				do{
-
-					// if (keypress = (char)getch()){
-
-					// }
-
-					do{
-						if (keypress = (char)getch()){
-
-						}
-					} while (keypress != quit && keypress != reset);	
-					//continue while player is not quitting, restarting or champion
-				
-					if (keypress == quit){
-						//prompt confirmation then erase message
-						write_text("Do you want to exit? y/n ", 50, 180, WHITE, 0); 
-						keypress = (char) getch();
-						erase(50, 180, 220, 40);	
-					} else if (keypress == reset){
-						//prompt confirmation then erase message
-						write_text("Do you want to restart? y/n ", 35, 180, WHITE, 0);
-						keypress = (char) getch();
-						if (keypress == yes) keypress = start;
-						erase(35, 180, 240, 40);	
-					}
-
-				} while (keypress != yes);
 
 			} while (keypress != back);
 		}
@@ -127,11 +179,32 @@ int main(){
 	clrscr();
 }
 
+void swapTile(int r1, int c1, int r2, int c2){
+	int temp = board[r1][c1];
+	board[r1][c1] = board[r2][c2];
+	board[r2][c2] = temp;
+}
+
+
+void randomizeBoard(){
+	board[0][0] = 5;
+	board[0][1] = 1;
+	board[0][2] = 3;
+	board[1][0] = 2;
+	board[1][1] = 0;
+	board[1][2] = 8;
+	board[2][0] = 4;
+	board[2][1] = 6;
+	board[2][2] = 7;
+}
+
 void setup_difficulty(){
 
 	switch(difficulty){
 	
-		case 1:						
+		case 1:
+			randomizeBoard();
+			print_board(120, 55);
 			break;
 
 		case 2:
@@ -142,8 +215,19 @@ void setup_difficulty(){
 
 	}	
 	
-	erase(190, 5, 30, 20); //erase menu
-	print_board(85, 35);
+}
+
+void print_square(int r, int c, int x, int y){
+	char str[15];
+
+	if (board[r][c] != 0){
+		sprintf(str,"%d",board[r][c]);
+		write_text(str,x,y,WHITE,0);
+	} else {
+		row0 = r;
+		col0 = c;
+		write_text(" ",x,y,WHITE,0);
+	}
 }
 
 void print_board(int x, int y){ //set up initial board 
@@ -162,6 +246,14 @@ void print_board(int x, int y){ //set up initial board
 		write_text("24 PUZZLE", 120, 5, WHITE, 0);
 	}
 
+	// print the board
+	for (i = 0; i < easyrow; i++, b+=24){
+		for (j = 0; j < easycol; j++, a+=31){
+			print_square(i, j , a, b);
+		}
+		a = x;
+	}
+
 	//display legend
 	write_text("Slide", 5, 45, WHITE, 0);
 	write_text("Up-W", 5, 55, WHITE, 0);
@@ -176,11 +268,36 @@ void print_board(int x, int y){ //set up initial board
 	
 }
 
-// update selected and previously selected bulb colors 
-void edit_board(){
+int goalTest(){
+	int i, j;
+	int goalState[3][3] = {
+		{1, 2, 3},
+		{4, 5, 6},
+		{7, 8, 0}
+	};
+	for (i = 0; i < easyrow; i++){
+		for (j = 0; j < easycol; j++){
+			if (board[i][j] != goalState[i][j]){
+				return 0;
+			}
+		}
+	}
+	write_text("NICE! Press any key!", 80, 180, WHITE, 0);
+	return 1;
+}
 
-	// light(oldrow, oldcol, bulbs_x[oldrow][oldcol], bulbs_y[oldrow][oldcol]);
-	// light(row, col, bulbs_x[row][col], bulbs_y[row][col]);
+void update_board(int x, int y){
+	int i, j, a, b;
+	a = x;
+	b = y;
+	erase(x, y, 75, 75);
+	// print the board
+	for (i = 0; i < easyrow; i++, b+=24){
+		for (j = 0; j < easycol; j++, a+=31){
+			print_square(i, j , a, b);
+		}
+		a = x;
+	}
 }
 
 void erase(int x, int y, int w, int h){ //basically covers an area with a black rectangle 
