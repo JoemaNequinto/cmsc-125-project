@@ -1,10 +1,16 @@
 #include "../../sdk/dexsdk.h"
 #include "../../sdk/time.h"
+#include "../../kernel/stdlib/stdlib.h"
 
 void setup_difficulty(); //self explanatory
-void print_board(int x, int y); //set up initial board
-void update_board();
-void erase(); //covers an area with a black rectangle
+void randomizeBoard(int dim, int config[dim][dim]);
+void swapTile(int dim, int config[dim][dim], int r1, int c1, int r2, int c2);
+void print_board(int dim, int config[dim][dim], int x, int y); //set up initial board
+int isSolvable();
+void print_square(int dim, int config[dim][dim], int r, int c, int x, int y);
+void update_board(int dim, int config[dim][dim], int x, int y);
+int goalTest(int difficulty);
+void erase(int x, int y, int w, int h); //covers an area with a black rectangle
 
 /* constants */
 #define easyrow 3
@@ -37,8 +43,10 @@ void erase(); //covers an area with a black rectangle
 
 /* global variables */
 int difficulty, moves = 0;
-int board[3][3] = { {1, 2, 3}, {4, 5, 6}, {7, 8, 0}};
-int row0, col0;
+int easyboard[easyrow][easycol] = { {1, 2, 3}, {4, 5, 6}, {7, 8, 0} };
+int mediumboard[mediumrow][mediumcol] = { {1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}, {13, 14, 15, 0} };
+int hardboard[hardrow][hardcol] = { {1, 2, 3, 4, 5}, {6, 7, 8, 9, 10}, {11, 12, 13, 14, 15}, {16, 17, 18, 19, 20}, {21, 22, 23, 24, 0} };
+int rowEmpty, colEmpty;
 
 int main(){
 
@@ -76,53 +84,51 @@ int main(){
 							write_text("0", 190, 150, WHITE, 0);
 						}
 
-
-
 						do {
 							if (keypress = (char)getch()){
 								if (keypress == right_key){
-									if (col0 != 2){
+									if (colEmpty != 2){
 										moves++;
 										erase(190, 150, 20, 20);
 										sprintf(str, "%d", moves);
 										write_text(str, 190, 150, WHITE, 0);
 
-										swapTile(row0, col0, row0, col0 + 1);
-										update_board(120, 55);
+										swapTile(3, easyboard, rowEmpty, colEmpty, rowEmpty, colEmpty + 1);
+										update_board(3, easyboard, 120, 55);
 									}
 								} else if (keypress == left_key){
-									if (col0 != 0){
+									if (colEmpty != 0){
 										moves++;
 										erase(190, 150, 20, 20);
 										sprintf(str, "%d", moves);
 										write_text(str, 190, 150, WHITE, 0);
 										
-										swapTile(row0, col0, row0, col0 - 1);
-										update_board(120, 55);
+										swapTile(3, easyboard, rowEmpty, colEmpty, rowEmpty, colEmpty - 1);
+										update_board(3, easyboard, 120, 55);
 									}
 								} else if (keypress == up_key){
-									if (row0 != 0){
+									if (rowEmpty != 0){
 										moves++;
 										erase(190, 150, 20, 20);
 										sprintf(str, "%d", moves);
 										write_text(str, 190, 150, WHITE, 0);
 										
-										swapTile(row0, col0, row0 - 1, col0);
-										update_board(120, 55);
+										swapTile(3, easyboard, rowEmpty, colEmpty, rowEmpty - 1, colEmpty);
+										update_board(3, easyboard, 120, 55);
 									}
 								} else if (keypress == down_key){
-									if (row0 != 2){
+									if (rowEmpty != 2){
 										moves++;
 										erase(190, 150, 20, 20);
 										sprintf(str, "%d", moves);
 										write_text(str, 190, 150, WHITE, 0);
 										
-										swapTile(row0, col0, row0 + 1, col0);
-										update_board(120, 55);
+										swapTile(3, easyboard, rowEmpty, colEmpty, rowEmpty + 1, colEmpty);
+										update_board(3, easyboard, 120, 55);
 									}
 								}
 
-								if (goalTest() == 1){
+								if (goalTest(1) == 1){
 									keypress = (char) getch();
 									keypress = easy;
 									break;
@@ -152,20 +158,168 @@ int main(){
 
 				else if(keypress == medium){
 					
-					difficulty = 2; //initialize difficulty
-					setup_difficulty();
-					//update level display
-					erase(25, 125, 40, 30);
-					write_text("0", 190, 150, WHITE, 0);
+					do{
+						if (keypress == medium){
+							difficulty = 2; //initialize difficulty
+							moves = 0;
+							erase(1, 1, 400, 220);
+							setup_difficulty();
+							erase(190, 150, 20, 20);
+							write_text("0", 190, 150, WHITE, 0);
+						}
+
+						do {
+							if (keypress = (char)getch()){
+								if (keypress == right_key){
+									if (colEmpty != 3){
+										moves++;
+										erase(190, 150, 20, 20);
+										sprintf(str, "%d", moves);
+										write_text(str, 190, 150, WHITE, 0);
+
+										swapTile(4, mediumboard, rowEmpty, colEmpty, rowEmpty, colEmpty + 1);
+										update_board(4, mediumboard, 110, 45);
+									}
+								} else if (keypress == left_key){
+									if (colEmpty != 0){
+										moves++;
+										erase(190, 150, 20, 20);
+										sprintf(str, "%d", moves);
+										write_text(str, 190, 150, WHITE, 0);
+										
+										swapTile(4, mediumboard, rowEmpty, colEmpty, rowEmpty, colEmpty - 1);
+										update_board(4, mediumboard, 110, 45);
+									}
+								} else if (keypress == up_key){
+									if (rowEmpty != 0){
+										moves++;
+										erase(190, 150, 20, 20);
+										sprintf(str, "%d", moves);
+										write_text(str, 190, 150, WHITE, 0);
+										
+										swapTile(4, mediumboard, rowEmpty, colEmpty, rowEmpty - 1, colEmpty);
+										update_board(4, mediumboard, 110, 45);
+									}
+								} else if (keypress == down_key){
+									if (rowEmpty != 3){
+										moves++;
+										erase(190, 150, 20, 20);
+										sprintf(str, "%d", moves);
+										write_text(str, 190, 150, WHITE, 0);
+										
+										swapTile(4, mediumboard, rowEmpty, colEmpty, rowEmpty + 1, colEmpty);
+										update_board(4, mediumboard, 110, 45);
+									}
+								}
+
+								if (goalTest(2) == 1){
+									keypress = (char) getch();
+									keypress = medium;
+									break;
+								}
+							}
+						} while (keypress != quit && keypress != reset);	
+						//continue while player is not quitting, restarting or champion
+					
+						if (keypress == quit){
+							//prompt confirmation then erase message
+							erase(120, 180, 40, 40);
+							write_text("Do you want to exit? y/n ", 50, 180, WHITE, 0); 
+							keypress = (char) getch();
+							erase(50, 180, 220, 40);	
+						} else if (keypress == reset){
+							//prompt confirmation then erase message
+							erase(120, 180, 40, 40);
+							write_text("Do you want to restart? y/n ", 35, 180, WHITE, 0);
+							keypress = (char) getch();
+							if (keypress == yes) keypress = medium;
+							erase(35, 180, 240, 40);	
+						}
+
+					} while (keypress != yes);
 				}
 
 				else if(keypress == hard){
 					
-					difficulty = 3; //initialize difficulty
-					setup_difficulty();
-					//update level display
-					erase(25, 125, 40, 30);
-					write_text("0", 190, 150, WHITE, 0);
+					do{
+						if (keypress == hard){
+							difficulty = 3; //initialize difficulty
+							moves = 0;
+							erase(1, 1, 400, 220);
+							setup_difficulty();
+							erase(190, 150, 20, 20);
+							write_text("0", 190, 150, WHITE, 0);
+						}
+
+						do {
+							if (keypress = (char)getch()){
+								if (keypress == right_key){
+									if (colEmpty != 4){
+										moves++;
+										erase(190, 150, 20, 20);
+										sprintf(str, "%d", moves);
+										write_text(str, 190, 150, WHITE, 0);
+
+										swapTile(5, hardboard, rowEmpty, colEmpty, rowEmpty, colEmpty + 1);
+										update_board(5, hardboard, 85, 35);
+									}
+								} else if (keypress == left_key){
+									if (colEmpty != 0){
+										moves++;
+										erase(190, 150, 20, 20);
+										sprintf(str, "%d", moves);
+										write_text(str, 190, 150, WHITE, 0);
+										
+										swapTile(5, hardboard, rowEmpty, colEmpty, rowEmpty, colEmpty - 1);
+										update_board(5, hardboard, 85, 35);
+									}
+								} else if (keypress == up_key){
+									if (rowEmpty != 0){
+										moves++;
+										erase(190, 150, 20, 20);
+										sprintf(str, "%d", moves);
+										write_text(str, 190, 150, WHITE, 0);
+										
+										swapTile(5, hardboard, rowEmpty, colEmpty, rowEmpty - 1, colEmpty);
+										update_board(5, hardboard, 85, 35);
+									}
+								} else if (keypress == down_key){
+									if (rowEmpty != 4){
+										moves++;
+										erase(190, 150, 20, 20);
+										sprintf(str, "%d", moves);
+										write_text(str, 190, 150, WHITE, 0);
+										
+										swapTile(5, hardboard, rowEmpty, colEmpty, rowEmpty + 1, colEmpty);
+										update_board(5, hardboard, 85, 35);
+									}
+								}
+
+								if (goalTest(3) == 1){
+									keypress = (char) getch();
+									keypress = hard;
+									break;
+								}
+							}
+						} while (keypress != quit && keypress != reset);	
+						//continue while player is not quitting, restarting or champion
+					
+						if (keypress == quit){
+							//prompt confirmation then erase message
+							erase(120, 180, 40, 40);
+							write_text("Do you want to exit? y/n ", 50, 180, WHITE, 0); 
+							keypress = (char) getch();
+							erase(50, 180, 220, 40);	
+						} else if (keypress == reset){
+							//prompt confirmation then erase message
+							erase(120, 180, 40, 40);
+							write_text("Do you want to restart? y/n ", 35, 180, WHITE, 0);
+							keypress = (char) getch();
+							if (keypress == yes) keypress = hard;
+							erase(35, 180, 240, 40);	
+						}
+
+					} while (keypress != yes);
 				}
 
 				else 
@@ -179,58 +333,45 @@ int main(){
 	clrscr();
 }
 
-void swapTile(int r1, int c1, int r2, int c2){
-	int temp = board[r1][c1];
-	board[r1][c1] = board[r2][c2];
-	board[r2][c2] = temp;
-}
-
-
-void randomizeBoard(){
-	board[0][0] = 5;
-	board[0][1] = 1;
-	board[0][2] = 3;
-	board[1][0] = 2;
-	board[1][1] = 0;
-	board[1][2] = 8;
-	board[2][0] = 4;
-	board[2][1] = 6;
-	board[2][2] = 7;
-}
-
 void setup_difficulty(){
 
 	switch(difficulty){
 	
 		case 1:
-			randomizeBoard();
-			print_board(120, 55);
+			randomizeBoard(3, easyboard);
+			print_board(3, easyboard, 120, 55);
 			break;
 
 		case 2:
+			randomizeBoard(4, mediumboard);
+			print_board(4, mediumboard, 110, 45);
 			break;
 	
 		case 3:
+			randomizeBoard(5, hardboard);
+			print_board(5, hardboard, 85, 35);
 			break;
 
 	}	
 	
 }
 
-void print_square(int r, int c, int x, int y){
-	char str[15];
-
-	if (board[r][c] != 0){
-		sprintf(str,"%d",board[r][c]);
-		write_text(str,x,y,WHITE,0);
-	} else {
-		row0 = r;
-		col0 = c;
-		write_text(" ",x,y,WHITE,0);
+void randomizeBoard(int dim, int config[dim][dim]){
+	int i, j;
+	for (i = 0; i < dim; i++){
+		for (j = 0; j < dim; j++){
+			swapTile(dim, config, i, j, rand() % 3, rand() % 3);
+		}
 	}
 }
 
-void print_board(int x, int y){ //set up initial board 
+void swapTile(int dim, int config[dim][dim], int r1, int c1, int r2, int c2){
+	int temp = config[r1][c1];
+	config[r1][c1] = config[r2][c2];
+	config[r2][c2] = temp;
+}
+
+void print_board(int dim, int config[dim][dim], int x, int y){ //set up initial board 
 
 	int i, j, a, b;
 	a = x;
@@ -247,9 +388,9 @@ void print_board(int x, int y){ //set up initial board
 	}
 
 	// print the board
-	for (i = 0; i < easyrow; i++, b+=24){
-		for (j = 0; j < easycol; j++, a+=31){
-			print_square(i, j , a, b);
+	for (i = 0; i < dim; i++, b+=24){
+		for (j = 0; j < dim; j++, a+=31){
+			print_square(dim, config, i, j , a, b);
 		}
 		a = x;
 	}
@@ -268,37 +409,94 @@ void print_board(int x, int y){ //set up initial board
 	
 }
 
-int goalTest(){
-	int i, j;
-	int goalState[3][3] = {
-		{1, 2, 3},
-		{4, 5, 6},
-		{7, 8, 0}
-	};
-	for (i = 0; i < easyrow; i++){
-		for (j = 0; j < easycol; j++){
-			if (board[i][j] != goalState[i][j]){
-				return 0;
-			}
-		}
-	}
-	write_text("NICE! Press any key!", 80, 180, WHITE, 0);
-	return 1;
+int isSolvable(){
+
 }
 
-void update_board(int x, int y){
+void print_square(int dim, int config[dim][dim], int r, int c, int x, int y){
+	char str[15];
+
+	if (config[r][c] != 0){
+		sprintf(str,"%d",config[r][c]);
+		write_text(str,x,y,WHITE,0);
+	} else {
+		rowEmpty = r;
+		colEmpty = c;
+		write_text(" ",x,y,WHITE,0);
+	}
+}
+
+void update_board(int dim, int config[dim][dim], int x, int y){
 	int i, j, a, b;
 	a = x;
 	b = y;
-	erase(x, y, 75, 75);
+	if (dim == 3) erase(x, y, 75, 75);
+	if (dim == 4) erase(x, y, 110, 100);
+	if (dim == 5) erase(x, y, 140, 110);
 	// print the board
-	for (i = 0; i < easyrow; i++, b+=24){
-		for (j = 0; j < easycol; j++, a+=31){
-			print_square(i, j , a, b);
+	for (i = 0; i < dim; i++, b+=24){
+		for (j = 0; j < dim; j++, a+=31){
+			print_square(dim, config, i, j , a, b);
 		}
 		a = x;
 	}
 }
+
+
+int goalTest(int difficulty){
+	int i, j;
+
+	if (difficulty == 1){
+		int goalState[3][3] = {
+			{1, 2, 3},
+			{4, 5, 6},
+			{7, 8, 0}
+		};
+		for (i = 0; i < 3; i++){
+			for (j = 0; j < 3; j++){
+				if (easyboard[i][j] != goalState[i][j]){
+					return 0;
+				}
+			}
+		}
+		write_text("NICE! Press any key!", 80, 180, WHITE, 0);
+		return 1;
+	} else if (difficulty == 2) {
+		int goalState[4][4] = {
+			{1, 2, 3, 4}, 
+			{5, 6, 7, 8}, 
+			{9, 10, 11, 12}, 
+			{13, 14, 15, 0} 
+		};
+		for (i = 0; i < 4; i++){
+			for (j = 0; j < 4; j++){
+				if (mediumboard[i][j] != goalState[i][j]){
+					return 0;
+				}
+			}
+		}
+		write_text("NICE! Press any key!", 80, 180, WHITE, 0);
+		return 1;
+	} else if (difficulty == 3) {
+		int goalState[5][5] = { 
+			{1, 2, 3, 4, 5}, 
+			{6, 7, 8, 9, 10}, 
+			{11, 12, 13, 14, 15}, 
+			{16, 17, 18, 19, 20}, 
+			{21, 22, 23, 24, 0} 
+		};
+		for (i = 0; i < 5; i++){
+			for (j = 0; j < 5; j++){
+				if (hardboard[i][j] != goalState[i][j]){
+					return 0;
+				}
+			}
+		}
+		write_text("NICE! Press any key!", 80, 180, WHITE, 0);
+		return 1;
+	}
+}
+
 
 void erase(int x, int y, int w, int h){ //basically covers an area with a black rectangle 
 	int i, j;
