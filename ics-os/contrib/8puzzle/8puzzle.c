@@ -89,7 +89,7 @@ int main(){
 								if (keypress == right_key){
 									if (colEmpty != 2){
 										moves++;
-										erase(190, 150, 20, 20);
+										erase(190, 150, 25, 20);
 										sprintf(str, "%d", moves);
 										write_text(str, 190, 150, WHITE, 0);
 
@@ -99,7 +99,7 @@ int main(){
 								} else if (keypress == left_key){
 									if (colEmpty != 0){
 										moves++;
-										erase(190, 150, 20, 20);
+										erase(190, 150, 25, 20);
 										sprintf(str, "%d", moves);
 										write_text(str, 190, 150, WHITE, 0);
 										
@@ -109,7 +109,7 @@ int main(){
 								} else if (keypress == up_key){
 									if (rowEmpty != 0){
 										moves++;
-										erase(190, 150, 20, 20);
+										erase(190, 150, 25, 20);
 										sprintf(str, "%d", moves);
 										write_text(str, 190, 150, WHITE, 0);
 										
@@ -119,7 +119,7 @@ int main(){
 								} else if (keypress == down_key){
 									if (rowEmpty != 2){
 										moves++;
-										erase(190, 150, 20, 20);
+										erase(190, 150, 25, 20);
 										sprintf(str, "%d", moves);
 										write_text(str, 190, 150, WHITE, 0);
 										
@@ -173,7 +173,7 @@ int main(){
 								if (keypress == right_key){
 									if (colEmpty != 3){
 										moves++;
-										erase(190, 150, 20, 20);
+										erase(190, 150, 25, 20);
 										sprintf(str, "%d", moves);
 										write_text(str, 190, 150, WHITE, 0);
 
@@ -183,7 +183,7 @@ int main(){
 								} else if (keypress == left_key){
 									if (colEmpty != 0){
 										moves++;
-										erase(190, 150, 20, 20);
+										erase(190, 150, 25, 20);
 										sprintf(str, "%d", moves);
 										write_text(str, 190, 150, WHITE, 0);
 										
@@ -193,7 +193,7 @@ int main(){
 								} else if (keypress == up_key){
 									if (rowEmpty != 0){
 										moves++;
-										erase(190, 150, 20, 20);
+										erase(190, 150, 25, 20);
 										sprintf(str, "%d", moves);
 										write_text(str, 190, 150, WHITE, 0);
 										
@@ -203,7 +203,7 @@ int main(){
 								} else if (keypress == down_key){
 									if (rowEmpty != 3){
 										moves++;
-										erase(190, 150, 20, 20);
+										erase(190, 150, 25, 20);
 										sprintf(str, "%d", moves);
 										write_text(str, 190, 150, WHITE, 0);
 										
@@ -256,7 +256,7 @@ int main(){
 								if (keypress == right_key){
 									if (colEmpty != 4){
 										moves++;
-										erase(190, 150, 20, 20);
+										erase(190, 150, 25, 20);
 										sprintf(str, "%d", moves);
 										write_text(str, 190, 150, WHITE, 0);
 
@@ -266,7 +266,7 @@ int main(){
 								} else if (keypress == left_key){
 									if (colEmpty != 0){
 										moves++;
-										erase(190, 150, 20, 20);
+										erase(190, 150, 25, 20);
 										sprintf(str, "%d", moves);
 										write_text(str, 190, 150, WHITE, 0);
 										
@@ -276,7 +276,7 @@ int main(){
 								} else if (keypress == up_key){
 									if (rowEmpty != 0){
 										moves++;
-										erase(190, 150, 20, 20);
+										erase(190, 150, 25, 20);
 										sprintf(str, "%d", moves);
 										write_text(str, 190, 150, WHITE, 0);
 										
@@ -286,7 +286,7 @@ int main(){
 								} else if (keypress == down_key){
 									if (rowEmpty != 4){
 										moves++;
-										erase(190, 150, 20, 20);
+										erase(190, 150, 25, 20);
 										sprintf(str, "%d", moves);
 										write_text(str, 190, 150, WHITE, 0);
 										
@@ -356,6 +356,28 @@ void setup_difficulty(){
 	
 }
 
+int isSolvable(int dim, int config[dim][dim]){
+
+	int i, j;
+	int newArray[dim * dim], inversions = 0;
+
+	for (i = 0; i < dim; i++){
+		for (j = 0; j < dim; j++){
+			newArray[(i * dim) + j] = config[i][j];
+		}
+	}
+
+	for (i = 0; i < (dim * dim - 1); i++){
+		for (j = i + 1; j < (dim * dim); j++){
+			if (newArray[i] > newArray[j]) inversions++;
+			if (newArray[i] == 0 && i%2 == 1) inversions++;
+		}
+	}	
+
+	if (inversions%2 == 0) return 1;
+	else return 0;
+}
+
 void randomizeBoard(int dim, int config[dim][dim]){
 	int i, j;
 	for (i = 0; i < dim; i++){
@@ -363,6 +385,7 @@ void randomizeBoard(int dim, int config[dim][dim]){
 			swapTile(dim, config, i, j, rand() % 3, rand() % 3);
 		}
 	}
+	if (isSolvable(dim, config) == 0) randomizeBoard(dim, config);
 }
 
 void swapTile(int dim, int config[dim][dim], int r1, int c1, int r2, int c2){
@@ -407,10 +430,6 @@ void print_board(int dim, int config[dim][dim], int x, int y){ //set up initial 
 	write_text("Reset-R", 40, 170, WHITE, 0);
 	write_text("Exit-X", 220, 170, WHITE, 0);
 	
-}
-
-int isSolvable(){
-
 }
 
 void print_square(int dim, int config[dim][dim], int r, int c, int x, int y){
