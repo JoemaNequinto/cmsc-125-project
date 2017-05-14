@@ -411,12 +411,13 @@ void print_board(int dim, int config[dim][dim], int x, int y){ //set up initial 
 	}
 
 	// print the board
-	for (i = 0; i < dim; i++, b+=24){
-		for (j = 0; j < dim; j++, a+=31){
-			print_square(dim, config, i, j , a, b);
-		}
-		a = x;
-	}
+	// for (i = 0; i < dim; i++, b+=24){
+	// 	for (j = 0; j < dim; j++, a+=31){
+	// 		print_square(dim, config, i, j , a, b);
+	// 	}
+	// 	a = x;
+	// }
+	update_board(dim, config, a, b);
 
 	//display legend
 	write_text("Slide", 5, 45, WHITE, 0);
@@ -449,10 +450,52 @@ void update_board(int dim, int config[dim][dim], int x, int y){
 	int i, j, a, b;
 	a = x;
 	b = y;
-	if (dim == 3) erase(x, y, 75, 75);
-	if (dim == 4) erase(x, y, 110, 100);
-	if (dim == 5) erase(x, y, 140, 110);
-	// print the board
+	if (dim == 3) {
+		erase(x, y, 75, 75);
+		// out border
+		drawHorizontalBorder(a-4, b-6, 75, 1);
+		drawVerticalBorder(a-4, b-6, 1, 68);
+		drawVerticalBorder(a+70, b-6, 1, 68);
+		drawHorizontalBorder(a-4, b+61, 75, 1);
+		// in border
+		drawHorizontalBorder(a-4, b+18, 75, 1);
+		drawHorizontalBorder(a-4, b+40, 75, 1);
+		drawVerticalBorder(a+21, b-6, 1, 68);
+		drawVerticalBorder(a+46, b-6, 1, 68);
+	}
+	if (dim == 4) {
+		erase(x, y, 110, 100);
+		// out border
+		drawHorizontalBorder(a-4, b-6, 115, 1);
+		drawVerticalBorder(a-4, b-6, 1, 94);
+		drawVerticalBorder(a+111, b-6, 1, 94);
+		drawHorizontalBorder(a-4, b+87, 115, 1);
+		// in border
+		drawVerticalBorder(a+25, b-6, 1, 94);
+		drawVerticalBorder(a+53, b-6, 1, 94);
+		drawVerticalBorder(a+81, b-6, 1, 94);
+		drawHorizontalBorder(a-4, b+18, 115, 1);
+		drawHorizontalBorder(a-4, b+42, 115, 1);
+		drawHorizontalBorder(a-4, b+66, 115, 1);
+	}
+	if (dim == 5) {
+		erase(x, y, 140, 110);
+		// out border
+		drawHorizontalBorder(a-4, b-6, 146, 1);
+		drawVerticalBorder(a-4, b-6, 1, 113);
+		drawVerticalBorder(a+142, b-6, 1, 113);
+		drawHorizontalBorder(a-4, b+106, 146, 1);
+		// in border
+		drawVerticalBorder(a+26, b-6, 1, 113);
+		drawVerticalBorder(a+56, b-6, 1, 113);
+		drawVerticalBorder(a+86, b-6, 1, 113);
+		drawVerticalBorder(a+116, b-6, 1, 113);
+		drawHorizontalBorder(a-4, b+17, 146, 1);
+		drawHorizontalBorder(a-4, b+40, 146, 1);
+		drawHorizontalBorder(a-4, b+63, 146, 1);
+		drawHorizontalBorder(a-4, b+86, 146, 1);
+	}
+
 	for (i = 0; i < dim; i++, b+=24){
 		for (j = 0; j < dim; j++, a+=31){
 			print_square(dim, config, i, j , a, b);
@@ -522,6 +565,20 @@ void erase(int x, int y, int w, int h){ //basically covers an area with a black 
 	for (i = y; i <= (y + h); i++)
 		for (j = x; j <= (x + w); j++)
 			write_pixel(j, i, 100);
+}
+
+void drawVerticalBorder(int x, int y, int w, int h){ //basically covers an area with a black rectangle 
+	int i, j;
+	for (i = y; i <= (y + h); i++)
+		for (j = x; j <= (x + w); j++)
+			write_pixel(j, i, WHITE);
+}
+
+void drawHorizontalBorder(int x, int y, int w, int h){ //basically covers an area with a black rectangle 
+	int i, j;
+	for (i = y; i <= (y + h); i++)
+		for (j = x; j <= (x + w); j++)
+			write_pixel(j, i, WHITE);
 }
 
 //displays header
